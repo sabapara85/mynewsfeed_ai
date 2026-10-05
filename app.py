@@ -1,7 +1,4 @@
 """Daily Briefing — Flask backend with two report types."""
-from dotenv import load_dotenv
-load_dotenv()
-
 import io
 import os
 import threading
@@ -9,6 +6,9 @@ import time
 import uuid
 from datetime import datetime
 from zoneinfo import ZoneInfo
+
+from dotenv import load_dotenv
+load_dotenv()
 
 from flask import Flask, abort, jsonify, render_template, request, send_file
 
@@ -26,6 +26,14 @@ _lock = threading.Lock()
 _cache = {"general": {"ts": 0.0, "id": None},
           "economic": {"ts": 0.0, "id": None}}
 _reports = {}
+
+
+# ---------- Global error handler (returns JSON, not HTML) ----------
+@app.errorhandler(Exception)
+def handle_error(e):
+    import traceback
+    traceback.print_exc()
+    return jsonify(error=f"{type(e).__name__}: {e}"), 500
 
 
 def _now_ist():
@@ -79,7 +87,6 @@ def _generate(report_type: str, force: bool = True) -> dict:
         _reports[payload["id"]] = payload
         _cache[report_type] = {"id": payload["id"], "ts": time.time()}
         if len(_reports) > MAX_REPORTS:
-            # Drop oldest by insertion order
             for key in list(_reports.keys())[:-MAX_REPORTS]:
                 _reports.pop(key, None)
 
@@ -107,7 +114,9 @@ def api_generate():
     try:
         data = _generate(report_type, force=True)
     except Exception as exc:  # noqa: BLE001
-        return jsonify(error=f"Generation failed: {exc}"), 500
+        import traceback
+        traceback.print_exc()
+        return jsonify(error=f"Generation failed: {type(exc).__name__}: {exc}"), 500
 
     return jsonify({
         "id": data["id"],
