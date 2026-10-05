@@ -98,6 +98,9 @@
     color:var(--accent);opacity:.85;font-variant-numeric:tabular-nums;
   }
   .i ol li::before{color:var(--green)}
+  ol li a{color:#D6E0F0;text-decoration:none}
+  ol li a:active{color:#93C5FD}
+  .arrow{color:#60A5FA;font-size:12px;margin-left:4px;opacity:.9}
 
   .outlook{
     font-size:14.2px;line-height:1.68;color:#D6E0F0;
@@ -155,13 +158,11 @@
   </div>
 
   <div id="results" class="hidden">
-    <!-- GENERAL SECTION -->
     <div id="secGeneral" class="card section g hidden">
       <h2><span class="bar"></span>General Awareness</h2>
       <ol id="listGeneral"></ol>
     </div>
 
-    <!-- ECONOMIC SECTIONS -->
     <div id="secInvestment" class="card section i hidden">
       <h2><span class="bar"></span>Investment Impact</h2>
       <ol id="listInvestment"></ol>
@@ -203,15 +204,15 @@ const msgs = {
     'Waking up the server…',
     'Pulling world & India news feeds…',
     'DeepSeek is summarising the news…',
-    'Distilling the top 10 items…',
-    'Building your PDF report…'
+    'Distilling the top stories…',
+    'Building your report…'
   ],
   economic: [
     'Waking up the server…',
     'Pulling markets & business feeds…',
     'DeepSeek is analysing the impact…',
     'Modelling India & US market outlook…',
-    'Building your PDF report…'
+    'Building your report…'
   ]
 };
 let msgTimer = null;
@@ -223,14 +224,40 @@ function startMessages(type){
 }
 function stopMessages(){ clearInterval(msgTimer); }
 
+/* ---- FIXED: handles both {text,url} objects and plain strings ---- */
 function fillList(el, items){
   el.innerHTML = '';
   (items || []).forEach(t => {
     const li = document.createElement('li');
-    li.textContent = t;
+
+    // Normalize: item may be a string OR {text, url}
+    let text = '';
+    let url  = '';
+    if (typeof t === 'string') {
+      text = t;
+    } else if (t && typeof t === 'object') {
+      text = t.text || '';
+      url  = t.url  || '';
+    }
+
+    if (url) {
+      const a = document.createElement('a');
+      a.href = url;
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+      a.textContent = text;
+      li.appendChild(a);
+      const arrow = document.createElement('span');
+      arrow.className = 'arrow';
+      arrow.textContent = '↗';
+      li.appendChild(arrow);
+    } else {
+      li.textContent = text;
+    }
     el.appendChild(li);
   });
 }
+
 function chip(id, label, value){
   document.getElementById(id).textContent = label + ': ' + value;
 }
@@ -257,7 +284,17 @@ async function generateReport(type){
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ type })
     });
-    const data = await res.json();
+
+    const raw = await res.text();
+    let data;
+    try {
+      data = JSON.parse(raw);
+    } catch {
+      console.error('Server said:', raw.slice(0, 800));
+      throw new Error(res.status === 502 || res.status === 504
+        ? 'Server timeout — service was waking up. Tap again.'
+        : 'Server error — check Render logs.');
+    }
     if (!res.ok) throw new Error(data.error || 'Request failed');
 
     if (type === 'general'){
@@ -277,7 +314,7 @@ async function generateReport(type){
     chip('chipDate',    'Date',    data.date);
     results.classList.remove('hidden');
   } catch(err){
-    statusEl.textContent = '⚠ ' + err.message + ' — try again in a moment.';
+    statusEl.textContent = '⚠ ' + err.message;
     statusEl.classList.add('warn');
   } finally {
     stopMessages();
