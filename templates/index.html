@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#0B1220" />
+<title>Daily Briefing · Viral Patel</title>
+<style>
+  :root{
+    --bg:#070B14; --panel:rgba(255,255,255,.045); --stroke:rgba(255,255,255,.09);
+    --txt:#E8EEF9; --muted:#8A9AB5; --accent:#3B82F6; --accent2:#8B5CF6;
+    --green:#10B981; --green2:#047857; --amber:#F59E0B; --purple:#A78BFA;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif;
+    background:
+      radial-gradient(900px 500px at 12% -10%, rgba(59,130,246,.18), transparent 60%),
+      radial-gradient(800px 500px at 92% 8%, rgba(139,92,246,.15), transparent 60%),
+      var(--bg);
+    color:var(--txt); min-height:100vh;
+    padding:max(20px, env(safe-area-inset-top)) 16px 40px;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:760px;margin:0 auto}
+
+  header{text-align:center;padding:14px 0 22px}
+  .badge{
+    display:inline-flex;align-items:center;gap:7px;
+    font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);
+    border:1px solid var(--stroke);background:var(--panel);
+    padding:6px 13px;border-radius:999px;margin-bottom:16px;
+  }
+  .dot{width:6px;height:6px;border-radius:50%;background:var(--green);
+       box-shadow:0 0 10px var(--green)}
+  h1{
+    font-size:clamp(26px,7vw,38px);font-weight:800;letter-spacing:-.03em;line-height:1.1;
+    background:linear-gradient(120deg,#fff 20%,#93C5FD 55%,#C4B5FD 85%);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  header p{color:var(--muted);font-size:13.5px;margin-top:9px;line-height:1.5}
+
+  .card{
+    background:var(--panel);border:1px solid var(--stroke);border-radius:20px;
+    backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  }
+
+  .panel{padding:20px;margin-bottom:16px}
+  .meta{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+  .chip{
+    font-size:11.5px;color:var(--muted);border:1px solid var(--stroke);
+    padding:5px 11px;border-radius:999px;background:rgba(255,255,255,.03);
+  }
+
+  .btn-group{display:flex;gap:10px}
+  button.primary{
+    flex:1;border:0;cursor:pointer;border-radius:15px;
+    padding:16px 10px;font-size:14.5px;font-weight:700;color:#fff;letter-spacing:-.01em;
+    font-family:inherit;transition:transform .16s ease,opacity .16s ease;
+  }
+  button.primary:active{transform:scale(.985)}
+  button.primary:disabled{opacity:.55;cursor:not-allowed}
+  #btnGeneral{background:linear-gradient(120deg,var(--accent),var(--accent2));
+    box-shadow:0 12px 32px -12px rgba(59,130,246,.75)}
+  #btnEconomic{background:linear-gradient(120deg,var(--green),var(--green2));
+    box-shadow:0 12px 32px -12px rgba(16,185,129,.75)}
+
+  .status{text-align:center;font-size:13px;color:var(--muted);margin-top:13px;min-height:19px}
+  .status.warn{color:var(--amber)}
+
+  .spinner{
+    width:44px;height:44px;margin:6px auto 14px;border-radius:50%;
+    border:3px solid rgba(255,255,255,.1);border-top-color:var(--accent);
+    animation:spin .85s linear infinite;
+  }
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  .section{margin-bottom:15px;padding:18px}
+  .section h2{
+    font-size:12px;letter-spacing:.13em;text-transform:uppercase;
+    display:flex;align-items:center;gap:9px;margin-bottom:14px;font-weight:800;
+  }
+  .bar{width:4px;height:16px;border-radius:3px}
+  .g .bar{background:var(--accent)} .i .bar{background:var(--green)}
+  .in .bar{background:var(--amber)} .us .bar{background:var(--purple)}
+  .g h2{color:#93C5FD} .i h2{color:#6EE7B7} .in h2{color:#FCD34D} .us h2{color:#C4B5FD}
+
+  ol{list-style:none;counter-reset:n}
+  ol li{
+    counter-increment:n;position:relative;padding:11px 0 11px 38px;
+    font-size:14.2px;line-height:1.58;color:#D6E0F0;
+    border-bottom:1px solid rgba(255,255,255,.055);
+  }
+  ol li:last-child{border-bottom:0;padding-bottom:2px}
+  ol li::before{
+    content:counter(n,decimal-leading-zero);
+    position:absolute;left:0;top:11px;font-size:11px;font-weight:800;
+    color:var(--accent);opacity:.85;font-variant-numeric:tabular-nums;
+  }
+  .i ol li::before{color:var(--green)}
+
+  .outlook{
+    font-size:14.2px;line-height:1.68;color:#D6E0F0;
+    background:rgba(255,255,255,.03);border-left:3px solid var(--amber);
+    border-radius:0 12px 12px 0;padding:14px 16px;
+  }
+  .us .outlook{border-left-color:var(--purple)}
+
+  .download{position:sticky;bottom:16px;margin-top:20px;z-index:5}
+  .download a{
+    display:flex;align-items:center;justify-content:center;gap:9px;
+    text-decoration:none;padding:17px;border-radius:15px;font-weight:700;font-size:15.5px;
+    color:#04140C;background:linear-gradient(120deg,#34D399,#10B981);
+    box-shadow:0 14px 36px -14px rgba(16,185,129,.8);
+  }
+  .download a:active{transform:scale(.985)}
+
+  footer{
+    text-align:center;margin-top:30px;padding-top:20px;font-size:12px;color:var(--muted);
+    border-top:1px solid var(--stroke);line-height:1.7;
+  }
+  footer strong{
+    font-weight:700;
+    background:linear-gradient(120deg,#60A5FA,#A78BFA);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .hidden{display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="badge"><span class="dot"></span>AI Intelligence Briefing</div>
+    <h1>Daily Briefing</h1>
+    <p>Choose what you want to generate<br/>DeepSeek-powered · PDF export</p>
+  </header>
+
+  <div class="card panel">
+    <div class="meta">
+      <span class="chip" id="chipSession">Edition: —</span>
+      <span class="chip" id="chipDate">Date: —</span>
+      <span class="chip">On demand</span>
+    </div>
+    <div class="btn-group">
+      <button class="primary" id="btnGeneral">General Awareness</button>
+      <button class="primary" id="btnEconomic">Economic Impact</button>
+    </div>
+    <div class="status" id="status">Free tier may take ~60s on the first run.</div>
+  </div>
+
+  <div id="loading" class="card panel hidden">
+    <div class="spinner"></div>
+    <div class="status" id="loadMsg">Waking up the server…</div>
+  </div>
+
+  <div id="results" class="hidden">
+    <!-- GENERAL SECTION -->
+    <div id="secGeneral" class="card section g hidden">
+      <h2><span class="bar"></span>General Awareness</h2>
+      <ol id="listGeneral"></ol>
+    </div>
+
+    <!-- ECONOMIC SECTIONS -->
+    <div id="secInvestment" class="card section i hidden">
+      <h2><span class="bar"></span>Investment Impact</h2>
+      <ol id="listInvestment"></ol>
+    </div>
+    <div id="secIndia" class="card section in hidden">
+      <h2><span class="bar"></span>India Market Outlook</h2>
+      <div class="outlook" id="indiaOutlook"></div>
+    </div>
+    <div id="secUsa" class="card section us hidden">
+      <h2><span class="bar"></span>USA Market Outlook</h2>
+      <div class="outlook" id="usaOutlook"></div>
+    </div>
+
+    <div class="download"><a id="dl" href="#">⬇ Download PDF Report</a></div>
+  </div>
+
+  <footer>
+    Developed by <strong>Viral Patel</strong><br/>
+    Automated AI pipeline · Not investment advice
+  </footer>
+
+</div>
+
+<script>
+const btnGeneral  = document.getElementById('btnGeneral');
+const btnEconomic = document.getElementById('btnEconomic');
+const statusEl    = document.getElementById('status');
+const loading     = document.getElementById('loading');
+const loadMsg     = document.getElementById('loadMsg');
+const results     = document.getElementById('results');
+
+const secGeneral    = document.getElementById('secGeneral');
+const secInvestment = document.getElementById('secInvestment');
+const secIndia      = document.getElementById('secIndia');
+const secUsa        = document.getElementById('secUsa');
+
+const msgs = {
+  general: [
+    'Waking up the server…',
+    'Pulling world & India news feeds…',
+    'DeepSeek is summarising the news…',
+    'Distilling the top 10 items…',
+    'Building your PDF report…'
+  ],
+  economic: [
+    'Waking up the server…',
+    'Pulling markets & business feeds…',
+    'DeepSeek is analysing the impact…',
+    'Modelling India & US market outlook…',
+    'Building your PDF report…'
+  ]
+};
+let msgTimer = null;
+
+function startMessages(type){
+  const list = msgs[type] || msgs.general;
+  let i = 0; loadMsg.textContent = list[0];
+  msgTimer = setInterval(() => { i = (i + 1) % list.length; loadMsg.textContent = list[i]; }, 7000);
+}
+function stopMessages(){ clearInterval(msgTimer); }
+
+function fillList(el, items){
+  el.innerHTML = '';
+  (items || []).forEach(t => {
+    const li = document.createElement('li');
+    li.textContent = t;
+    el.appendChild(li);
+  });
+}
+function chip(id, label, value){
+  document.getElementById(id).textContent = label + ': ' + value;
+}
+function resetSections(){
+  [secGeneral, secInvestment, secIndia, secUsa].forEach(s => s.classList.add('hidden'));
+}
+
+async function generateReport(type){
+  btnGeneral.disabled = true;
+  btnEconomic.disabled = true;
+  btnGeneral.textContent = type === 'general' ? 'Generating…' : 'General Awareness';
+  btnEconomic.textContent = type === 'economic' ? 'Generating…' : 'Economic Impact';
+
+  statusEl.textContent = '';
+  statusEl.classList.remove('warn');
+  results.classList.add('hidden');
+  resetSections();
+  loading.classList.remove('hidden');
+  startMessages(type);
+
+  try{
+    const res = await fetch('/api/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Request failed');
+
+    if (type === 'general'){
+      fillList(document.getElementById('listGeneral'), data.general_summary);
+      secGeneral.classList.remove('hidden');
+    } else {
+      fillList(document.getElementById('listInvestment'), data.investment_summary);
+      document.getElementById('indiaOutlook').textContent = data.india_market_outlook || 'unclear';
+      document.getElementById('usaOutlook').textContent   = data.usa_market_outlook || 'unclear';
+      secInvestment.classList.remove('hidden');
+      secIndia.classList.remove('hidden');
+      secUsa.classList.remove('hidden');
+    }
+
+    document.getElementById('dl').href = '/download/' + data.id;
+    chip('chipSession', 'Edition', data.session);
+    chip('chipDate',    'Date',    data.date);
+    results.classList.remove('hidden');
+  } catch(err){
+    statusEl.textContent = '⚠ ' + err.message + ' — try again in a moment.';
+    statusEl.classList.add('warn');
+  } finally {
+    stopMessages();
+    loading.classList.add('hidden');
+    btnGeneral.disabled = false;
+    btnEconomic.disabled = false;
+    btnGeneral.textContent = 'General Awareness';
+    btnEconomic.textContent = 'Economic Impact';
+    btnGeneral.scrollIntoView({ behavior:'smooth', block:'start' });
+  }
+}
+
+btnGeneral.addEventListener('click',  () => generateReport('general'));
+btnEconomic.addEventListener('click', () => generateReport('economic'));
+</script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: news-briefing
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app --timeout 180 --workers 1 --threads 4 --bind 0.0.0.0:$PORT
+    envVars:
+      - key: DEEPSEEK_API_KEY
+        sync: false
+      - key: DEEPSEEK_BASE_URL
+        value: https://api.deepseek.com
+      - key: DEEPSEEK_MODEL
+        value: deepseek-v4-flash
+      - key: PYTHON_VERSION
+        value: 3.12.5
