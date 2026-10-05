@@ -1,4 +1,4 @@
-"""ReportLab PDF builder — branded, paginated, report-type aware."""
+"""ReportLab PDF builder — branded, paginated, report-type aware, clickable links."""
 import io
 from datetime import datetime
 
@@ -83,12 +83,33 @@ def _section_header(text, color, styles, width):
 
 
 def _numbered_list(lines, styles, width):
+    """lines is a list of dicts: {'text': str, 'url': str} OR plain strings."""
     rows = []
-    for i, line in enumerate(lines, start=1):
+    for i, item in enumerate(lines, start=1):
+        # Support both dict and string inputs (backwards compatible)
+        if isinstance(item, dict):
+            text = item.get("text", "")
+            url = item.get("url", "")
+        else:
+            text = str(item)
+            url = ""
+
+        # Escape minimal XML entities so ReportLab doesn't choke
+        safe = (text
+                .replace("&", "&amp;")
+                .replace("<", "&lt;")
+                .replace(">", "&gt;"))
+
+        if url:
+            body = f'<a href="{url}" color="#2563EB">{safe}</a>'
+        else:
+            body = safe
+
         rows.append([
             Paragraph(f"{i:02d}", styles["num"]),
-            Paragraph(line, styles["body"]),
+            Paragraph(body, styles["body"]),
         ])
+
     t = Table(rows, colWidths=[9 * mm, width - 9 * mm])
     t.setStyle(TableStyle([
         ("VALIGN", (0, 0), (-1, -1), "TOP"),
@@ -102,7 +123,11 @@ def _numbered_list(lines, styles, width):
 
 
 def _outlook_box(text, styles, width):
-    t = Table([[Paragraph(text, styles["outlook"])]], colWidths=[width])
+    safe = (str(text)
+            .replace("&", "&amp;")
+            .replace("<", "&lt;")
+            .replace(">", "&gt;"))
+    t = Table([[Paragraph(safe, styles["outlook"])]], colWidths=[width])
     t.setStyle(TableStyle([
         ("BACKGROUND", (0, 0), (-1, -1), LIGHT),
         ("BOX", (0, 0), (-1, -1), 0.5, colors.HexColor("#CBD5E1")),
